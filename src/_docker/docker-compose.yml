@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  webapi:
+    image: docker-dotnetcore/webapi:develop
+    build:
+      context: ../WebApi
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+      - elasticsearch
+  client:
+    image: docker-dotnetcore/client:develop
+    build:
+      context: ../Client
+      dockerfile: Dockerfile
+    depends_on:
+      - webapi
+      - elasticsearch
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
+    ports:
+      - "9200:9200"
