@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Serilog;
 using Serilog.Core;
+
+using WebApi.Models;
+using WebApi.Services;
 
 namespace WebApi
 {
@@ -51,8 +55,18 @@ namespace WebApi
         //IServiceCollection : servirá para injetarmos nossos próprios services ou qualquer “coisa” que usaremos no longo de nossa aplicação.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<BookstoreDatabaseSettings>(
+            Configuration.GetSection(nameof(BookstoreDatabaseSettings)));
+
+            services.AddSingleton<IBookstoreDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<BookstoreDatabaseSettings>>().Value);
+
+            services.AddSingleton<BookService>();
+
             //SetCompatibilityVersion – Necessário para manter a compatibilidade entre versões de framework.
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .AddJsonOptions(options => options.UseMemberCasing())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         
